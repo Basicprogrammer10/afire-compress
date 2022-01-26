@@ -1,3 +1,7 @@
+//! Compress outgoing HTTP
+
+#![warn(missing_docs)]
+
 use std::cell::RefCell;
 use std::fmt;
 use std::io::prelude::*;
@@ -11,6 +15,7 @@ use brotli2;
 use flate2;
 use libflate::deflate;
 
+/// Compression Methods
 #[derive(Debug, Clone, Copy)]
 pub enum CompressType {
     /// Gzip Compression
@@ -20,9 +25,14 @@ pub enum CompressType {
 
     /// Deflate Compression
     Deflate,
+
+    /// Brotli Compression
+    ///
+    /// The number is the quality (0-9)
     Brotli(u32),
 }
 
+/// Compression Middleware
 #[derive(Debug, Clone, Copy)]
 pub struct Compress {
     compression: CompressType,
@@ -81,6 +91,7 @@ impl Middleware for Compress {
 }
 
 impl Compress {
+    /// Make a new Compressor
     pub fn new() -> Self {
         Compress {
             compression: CompressType::Gzip(6),
@@ -88,10 +99,17 @@ impl Compress {
         }
     }
 
+    /// Set the body size threshold.
+    /// This stops from compressing tiny ammounts of data
+    ///
+    /// Deafult is 1024
     pub fn threshold(self, threshold: usize) -> Self {
         Compress { threshold, ..self }
     }
 
+    /// Set compression method
+    ///
+    /// Defult is Gzip(6)
     pub fn compression(self, compression: CompressType) -> Self {
         Compress {
             compression,
@@ -99,6 +117,7 @@ impl Compress {
         }
     }
 
+    /// Attach Compressor to a server
     pub fn attach(self, server: &mut Server)
     where
         Self: Sized + 'static,
