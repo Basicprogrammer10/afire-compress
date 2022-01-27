@@ -2,7 +2,7 @@ use afire::{Method, Response, Server};
 use afire_compress::{Compress, CompressType};
 
 fn main() {
-    let mut server = Server::new("localhost", 3030);
+    let mut server = Server::new("localhost", 8080);
 
     Compress::new()
         .threshold(0)
