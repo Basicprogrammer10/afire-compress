@@ -8,11 +8,9 @@ use std::io::prelude::*;
 
 use afire::{
     middleware::{MiddleResponse, Middleware},
-    Header, Request, Response, Server,
+    Content, Header, Request, Response, Server,
 };
 
-use brotli2;
-use flate2;
 use libflate::deflate;
 
 /// Compression Methods
@@ -41,16 +39,16 @@ pub struct Compress {
 
 impl Middleware for Compress {
     fn post(&mut self, req: Request, res: Response) -> MiddleResponse {
-        // Dont compress if body is under threshold
+        // Don't compress if body is under threshold
         if res.data.len() <= self.threshold {
             return MiddleResponse::Continue;
         }
 
-        // Check if client dosent support compression
+        // Check if client doesn't support compression
         match req.header("Accept-Encoding") {
             Some(i) => {
                 if !i
-                    .split(",")
+                    .split(',')
                     .map(|x| x.trim().to_owned())
                     .collect::<Vec<_>>()
                     .contains(&self.compression.to_string())
@@ -85,7 +83,7 @@ impl Middleware for Compress {
         MiddleResponse::Add(
             res.bytes(new.0)
                 .header(Header::new("Content-Encoding", new.1))
-                .content(afire::Content::TXT),
+                .content(Content::TXT),
         )
     }
 }
@@ -100,16 +98,16 @@ impl Compress {
     }
 
     /// Set the body size threshold.
-    /// This stops from compressing tiny ammounts of data
+    /// This stops from compressing tiny amounts of data
     ///
-    /// Deafult is 1024
+    /// Default is 1024
     pub fn threshold(self, threshold: usize) -> Self {
         Compress { threshold, ..self }
     }
 
     /// Set compression method
     ///
-    /// Defult is Gzip(6)
+    /// Default is Gzip(6)
     pub fn compression(self, compression: CompressType) -> Self {
         Compress {
             compression,
@@ -137,5 +135,11 @@ impl fmt::Display for CompressType {
                 CompressType::Brotli(_) => "br",
             }
         )
+    }
+}
+
+impl Default for Compress {
+    fn default() -> Self {
+        Self::new()
     }
 }
