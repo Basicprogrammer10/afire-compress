@@ -1,5 +1,6 @@
 # afire-compress
-🦄 afire middleware to compress outgoing HTTP traffic
+
+🦄 afire middleware to compress outgoing HTTP traffic.
 
 Supports `Gzip`, `Deflate`, and `Brotli`.
 Make sure this is the first middleware added to a server.
